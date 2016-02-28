@@ -255,11 +255,8 @@ static void rtlsdr_callback(unsigned char *buf, uint32_t len, void *ctx)
 		ppm_test(len);
 }
 
-<<<<<<< HEAD
-/* Controls the smallest band or band gap that tuner_benchmark() will notice */
-=======
+
 /* smallest band or band gap that tuner_benchmark() will notice */
->>>>>>> 0d825fe08ef1e0225340fa7d8dffa621ad80a818
 static uint32_t max_step(uint32_t freq) {
 	if (freq < 1e6)
 		return 1e4;
@@ -267,46 +264,6 @@ static uint32_t max_step(uint32_t freq) {
 		return 1e6;
 	return freq / 1e2;
 }
-<<<<<<< HEAD
-
-/* Controls the precision with which tuner_benchmark() will measure the edges of tuning bands */
-static uint32_t min_step(uint32_t freq) {
-	return 100;
-}
-
-static void report_band_start(uint32_t start) {
-	fprintf(stderr, "Found a new band starting at %u Hz\n", start);
-}
-
-static void report_band(uint32_t low, uint32_t high) {
-	fprintf(stderr, "Tuning band: %u - %u Hz\n", low, high);
-}
-
-void tuner_benchmark(void)
-{
-	uint32_t current = max_step(0);
-	uint32_t band_start = 0;
-	uint32_t low_bound = 0, high_bound = 0;
-	char buf[20];
-	enum { FIND_START, REFINE_START, FIND_END, REFINE_END } state;
-
-	fprintf(stderr, "Testing tuner range. This may take a couple of minutes..\n");
-
-	/* Scan for tuneable frequencies coarsely. When we find something,
-	 * do a binary search to narrow down the exact edge of the band.
-	 *
-	 * This can potentially miss bands or band gaps that are smaller than max_step(freq)
-	 * but it is a lot faster than exhaustively scanning everything.
-	 */
-
-	/* handle bands starting at 0Hz */
-	if (rtlsdr_set_center_freq(dev, 0) < 0)
-		state = FIND_START;
-	else {
-		band_start = 0;
-		report_band_start(band_start);
-		state = FIND_END;
-=======
 
 /* precision with which tuner_benchmark() will measure the edges of bands */
 static uint32_t min_step(uint32_t freq) {
@@ -338,114 +295,10 @@ uint32_t coarse_search(uint32_t start, int lock)
 		if (status == lock)
 			return f;
 		f = f2;
->>>>>>> 0d825fe08ef1e0225340fa7d8dffa621ad80a818
 	}
 	return SCAN_LIMIT + 1;
 }
 
-<<<<<<< HEAD
-	while (current < 3e9 && !do_exit) {
-		switch (state) {
-		case FIND_START:
-			/* scanning for the start of a new band */
-			if (rtlsdr_set_center_freq(dev, current) < 0) {
-				/* still looking for a band */
-				low_bound = current;
-				current += max_step(current);
-			} else {
-				/* new band, starting somewhere at or before current */
-				/* low_bound < start <= current, refine it */
-				high_bound = current;
-				state = REFINE_START;
-			}
-			break;
-
-		case REFINE_START:
-			/* refining the start of a band */
-			/* low_bound < bandstart <= high_bound */
-			if (rtlsdr_set_center_freq(dev, current) == 0) {
-				/* current is inside the band */
-				/* low_bound < bandstart <= current */
-				if (current - low_bound <= min_step(current)) {
-					/* close enough. Say the band starts at current and go looking for the end of it. */
-					band_start = current;
-					report_band_start(band_start);
-					low_bound = current;
-					state = FIND_END;
-				} else {
-					/* try halfway between low_bound and current */
-					high_bound = current;
-					current = (current + low_bound) / 2;
-				}
-			} else {
-				/* current is outside the band */
-				/* current < bandstart <= high_bound */
-				if (high_bound - current <= min_step(current)) {
-					/* close enough. Say the band starts at high_bound and go looking for the end of it. */
-					current = low_bound = band_start = high_bound;
-					report_band_start(band_start);
-					state = FIND_END;
-				} else {
-					/* try halfway betwen current and high_bound */
-					low_bound = current;
-					current = (current + high_bound) / 2;
-				}
-			}
-			break;
-
-		case FIND_END:
-			/* scanning for the end of the current band */
-			if (rtlsdr_set_center_freq(dev, current) == 0) {
-				/* still looking for the end of the band */
-				low_bound = current;
-				current += max_step(current);
-			} else {
-				/* ran off the end of the band somewhere before current */
-				/* low_bound <= bandend < current, refine it */
-				high_bound = current;
-				state = REFINE_END;
-			}
-			break;
-
-		case REFINE_END:
-			/* refining the end of a band */
-			/* low_bound <= bandend < high_bound */
-			if (rtlsdr_set_center_freq(dev, current) < 0) {
-				/* current is outside the band */
-				/* low_bound <= bandend < current */
-				if (current - low_bound <= min_step(current)) {
-					/* close enough. Say the band ends at low_bound and go looking for another band. */
-					report_band(band_start, low_bound);
-					low_bound = current;
-					state = FIND_START;
-				} else {
-					/* try halfway between low_bound and current */
-					high_bound = current;
-					current = (current + low_bound) / 2;
-				}
-			} else {
-				/* current is inside the band */
-				/* current <= bandend < high_bound */
-				if (high_bound - current <= min_step(current)) {
-					/* close enough. Say the band ends at current and go looking for another band. */
-					report_band(band_start, current);
-					current = low_bound = high_bound;
-					state = FIND_START;
-				} else {
-					/* try halfway betwen current and high_bound */
-					low_bound = current;
-					current = (current + high_bound) / 2;
-				}
-			}
-			break;
-		}
-	}
-
-	if (state == FIND_END)
-		report_band(band_start, current);
-	else if (state == REFINE_END)
-		report_band(band_start, low_bound);
-=======
 /* returns frequency of a transition
  * must have one transition between start and start+step */
 uint32_t fine_search(uint32_t start, uint32_t step)
@@ -489,7 +342,6 @@ void tuner_benchmark(void)
 			break;
 		fprintf(stderr, "Band: %u - %u Hz\n", low_bound, high_bound);
 	}
->>>>>>> 0d825fe08ef1e0225340fa7d8dffa621ad80a818
 }
 
 int main(int argc, char **argv)
