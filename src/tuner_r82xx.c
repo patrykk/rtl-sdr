@@ -923,8 +923,8 @@ static int r82xx_init_tv_standard(struct r82xx_priv *priv,
 }
 
 
-static int r82xx_set_if_filter(struct r82xx_priv *priv, int hpf, int lpf) {
-	int rc;
+static int update_if_filter(struct r82xx_priv *priv) {
+	int rc, i, hpf, lpf;
 	uint8_t filt_q, hp_cor;
 	int cal;
 
