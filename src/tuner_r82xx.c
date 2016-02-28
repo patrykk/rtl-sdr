@@ -1244,13 +1244,13 @@ int r82xx_set_nomod(struct r82xx_priv *priv)
 	if (rc < 0) goto err;
 
 	/* the VCO frequency setting still seems to have some effect on the noise floor */
-	rc = r82xx_set_pll(priv, 50000000);
+	rc = r82xx_set_pll(priv, 50000000,NULL);
 	if (rc < 0) goto err;
 
 	/* the most important part: set a divider number that does not really work */
 	rc = r82xx_write_reg_mask(priv, 0x10, 0xd0, 0xe0);
 	if (rc < 0) goto err;
-
+	
 	/* VCO power off */
 	rc = r82xx_write_reg_mask(priv, 0x12, 0xe0, 0xe0);
 
