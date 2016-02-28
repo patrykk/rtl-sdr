@@ -368,11 +368,7 @@ static int r82xx_write_batch_sync(struct r82xx_priv *priv)
 		return -1;
 	priv->reg_batch = 0;
 	if (priv->reg_low > priv->reg_high)
-<<<<<<< HEAD
-		return 0; /* No work to do */
-=======
 		return 0; /* No registers were changed */
->>>>>>> 0d825fe08ef1e0225340fa7d8dffa621ad80a818
 	offset = priv->reg_low - REG_SHADOW_START;
 	len = priv->reg_high - priv->reg_low + 1;
 	rc = r82xx_write(priv, priv->reg_low, priv->regs+offset, len);
@@ -926,13 +922,9 @@ static int r82xx_init_tv_standard(struct r82xx_priv *priv,
 	return 0;
 }
 
-<<<<<<< HEAD
-static int update_if_filter(struct r82xx_priv *priv) {
-	int rc, i, hpf, lpf;
-=======
+
 static int r82xx_set_if_filter(struct r82xx_priv *priv, int hpf, int lpf) {
 	int rc;
->>>>>>> 0d825fe08ef1e0225340fa7d8dffa621ad80a818
 	uint8_t filt_q, hp_cor;
 	int cal;
 
@@ -979,11 +971,8 @@ static int r82xx_set_if_filter(struct r82xx_priv *priv, int hpf, int lpf) {
 	else if(cal > 15) cal = 15;
 	priv->fil_cal_code = cal;
 
-<<<<<<< HEAD
-=======
 	//fprintf(stderr, "Setting IF filter for %d...%d kHz: hp_cor=0x%02x, fil_cal_code=%d\n", hpf, lpf, hp_cor, cal);
 
->>>>>>> 0d825fe08ef1e0225340fa7d8dffa621ad80a818
 	rc = r82xx_write_reg_mask(priv, 0x0a,
 				  filt_q | priv->fil_cal_code, 0x1f);
 	if (rc < 0)
@@ -1262,12 +1251,8 @@ int r82xx_set_nomod(struct r82xx_priv *priv)
 	rc = r82xx_write_reg_mask(priv, 0x10, 0xd0, 0xe0);
 	if (rc < 0) goto err;
 
-<<<<<<< HEAD
-	r82xx_set_pll(priv, 25000000, NULL);
-=======
 	/* VCO power off */
 	rc = r82xx_write_reg_mask(priv, 0x12, 0xe0, 0xe0);
->>>>>>> 0d825fe08ef1e0225340fa7d8dffa621ad80a818
 
 err:
 	if (rc < 0)
